@@ -1,6 +1,6 @@
 <!-- Chosen Palette: Monochrome High-Contrast Print (Pure Black #000000 & Crisp White with Slate Accents) -->
-<!-- Application Structure Plan: A clean single-page Bengali Advertisement Billing Application designed specifically for newspaper/media bill generation. It features inch x column / fixed calculations, Bengali number-to-words conversion, strict DD-MM-YYYY dates, 100% black font styling, 3-inch top margin pad spacing, and a beautifully structured multi-column print header for office addresses (Editorial HQ, District Office, Mobile) to ensure optimal aesthetics and zero truncation. -->
-<!-- Visualization & Content Choices: Dynamic calculation UI using Vanilla JS, responsive Tailwind grid, media print optimization for A4 (Top: 3in/0.6in, Bottom: 1.5in, Sides: 1in), 14pt pure black font size, structured address block grid layout, and custom address inputs. Zero SVG graphics used. -->
+<!-- Application Structure Plan: A dynamic, single-page Bengali Advertisement Billing Application designed for newspaper ad generation. It features an enhanced fully dynamic address block customizer with increased line height and spacing for better print readability, inch x column / fixed calculation modes, Bengali number-to-words conversion, strict DD-MM-YYYY dates, 100% black font styling, 3-inch top margin pad spacing toggle for pre-printed pads vs plain paper, and responsive Tailwind UI. -->
+<!-- Visualization & Content Choices: Dynamic UI calculation via Vanilla JS, responsive grid layout, media print optimization for A4 (Top: 3in/0.6in, Bottom: 1.5in, Left/Right: 1in), 14pt pure black font size, spacious dynamic address block with generous line spacing, and zero SVG graphics. -->
 <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
 <html lang="bn">
@@ -8,12 +8,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>বিজ্ঞাপন বিলিং সফটওয়্যার - দৈনিক আমাদের সংবাদ</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Bangla Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Global Font Settings - Only Bangla Fonts */
         * {
             font-family: 'Hind Siliguri', 'SolaimanLipi', 'Kalpurush', sans-serif !important;
         }
@@ -23,12 +20,10 @@
             color: #000000;
         }
 
-        /* Screen setup for printable paper area */
         #printableInvoice {
             display: none;
         }
 
-        /* Print Media Styling - Exactly 3 Inch Top Margin, 14pt Pure Black Text */
         @media print {
             body * {
                 visibility: hidden;
@@ -45,17 +40,15 @@
                 top: 0;
                 width: 100%;
                 margin: 0;
-                /* Margin Settings: Top Margin managed dynamically, Bottom 1.5 inch, Left/Right 1 inch */
                 padding-bottom: 1.5in !important;
                 padding-left: 1in !important;
                 padding-right: 1in !important;
                 background: #ffffff !important;
                 box-shadow: none !important;
                 font-size: 14pt !important;
-                line-height: 1.4;
+                line-height: 1.5;
             }
 
-            /* Dynamic top padding class applied by JavaScript */
             .print-pad-mode {
                 padding-top: 3in !important;
             }
@@ -75,27 +68,29 @@
             }
             @page {
                 size: A4 portrait;
-                margin: 0; /* Handled via container padding for exact browser consistency */
+                margin: 0;
             }
         }
 
-        /* Printable Custom Font Sizes */
         .print-text-14pt {
             font-size: 14pt !important;
         }
         .print-text-head {
-            font-size: 22pt !important;
-            line-height: 1.2;
+            font-size: 24pt !important;
+            line-height: 1.25;
         }
         .print-text-subhead {
             font-size: 14pt !important;
+        }
+
+        .address-line-height {
+            line-height: 1.75 !important;
         }
     </style>
 </head>
 
 <body class="text-black antialiased min-h-screen flex flex-col justify-between">
 
-    <!-- Top Navigation Header -->
     <header class="bg-black text-white shadow-md no-print-element">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
             <div class="flex items-center space-x-3 space-x-reverse">
@@ -104,7 +99,7 @@
                 </div>
                 <div>
                     <h1 class="text-xl font-bold tracking-tight text-white">বিজ্ঞাপন বিলিং সফটওয়্যার</h1>
-                    <p class="text-xs text-slate-300">দৈনিক আমাদের সংবাদ - প্যাড মার্জিন: ৩ ইঞ্চি | ফন্ট: ১৪pt বাংলা</p>
+                    <p class="text-xs text-slate-300">দৈনিক আমাদের সংবাদ - বৃদ্ধিপ্রাপ্ত ঠিকানার লাইন স্পেস ও ডায়নামিক প্যাড</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -115,11 +110,9 @@
         </div>
     </header>
 
-    <!-- Main Content Grid -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow no-print-element">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
-            <!-- Billing Input Form (7 Cols) -->
             <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-300">
                 <h2 class="text-lg font-bold text-black mb-6 pb-2 border-b border-slate-200 flex items-center gap-2">
                     <span class="w-2.5 h-2.5 bg-black rounded-full"></span>
@@ -128,7 +121,6 @@
 
                 <form id="billingForm" onsubmit="event.preventDefault(); printDirectly();">
                     
-                    <!-- Basic Information -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
                         <div>
                             <label class="block text-xs font-bold text-black mb-1">গ্রাহক / প্রতিষ্ঠানের নাম <span class="text-rose-600">*</span></label>
@@ -148,7 +140,6 @@
                         </div>
                     </div>
 
-                    <!-- Calculation Type Selector -->
                     <div class="bg-slate-100 p-5 rounded-xl border border-slate-300 mb-6">
                         <label class="block text-xs font-bold text-black mb-3">বিজ্ঞাপন হিসাবের ধরন নির্বাচন করুন:</label>
                         <div class="flex items-center gap-6 mb-4">
@@ -162,7 +153,6 @@
                             </label>
                         </div>
 
-                        <!-- Inch x Column Mode Inputs -->
                         <div id="inchSection" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div>
                                 <label class="block text-xs font-bold text-black mb-1">ইঞ্চি (Height)</label>
@@ -178,7 +168,6 @@
                             </div>
                         </div>
 
-                        <!-- Fixed Rate Mode Input -->
                         <div id="fixedSection" class="hidden">
                             <div>
                                 <label class="block text-xs font-bold text-black mb-1">সর্বমোট ফিক্সড রেট (টাকা)</label>
@@ -187,7 +176,6 @@
                         </div>
                     </div>
 
-                    <!-- Tax & Discount Section -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                         <div>
                             <label class="block text-xs font-bold text-black mb-1">ভ্যাট / ট্যাক্স (%)</label>
@@ -203,7 +191,6 @@
                         </div>
                     </div>
 
-                    <!-- Pre-printed Pad Options & Header Checkbox -->
                     <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-6">
                         <label class="flex items-center gap-3 cursor-pointer">
                             <input type="checkbox" id="toggleHeaderCheckbox" checked onchange="toggleHeaderVisibility()" class="w-5 h-5 text-black rounded focus:ring-black">
@@ -214,10 +201,9 @@
                         </label>
                     </div>
 
-                    <!-- Letterhead Details Customizer -->
-                    <details class="mb-6 bg-slate-50 border border-slate-300 rounded-xl p-4">
+                    <details open class="mb-6 bg-slate-50 border border-slate-300 rounded-xl p-4">
                         <summary class="cursor-pointer text-xs font-bold text-black hover:underline transition">
-                            ⚙️ প্যাডের শিরোনাম ও ঠিকানার তথ্য পরিবর্তন করুন
+                            ⚙️ প্যাডের ডায়নামিক ঠিকানা, ওয়েবসাইট ও হেডার কাস্টমাইজ করুন
                         </summary>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-300">
                             <div>
@@ -240,10 +226,17 @@
                                 <label class="block text-[11px] font-bold text-black">মোবাইল নম্বর</label>
                                 <input type="text" id="companyMobileInput" value="০১৯১৫০৯১৫২৯" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
                             </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-black">ওয়েবসাইট ইউআরএল</label>
+                                <input type="text" id="companyWebsiteInput" value="www.amadersangbad.com" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-black">ইমেইল ঠিকানা</label>
+                                <input type="text" id="companyEmailInput" value="info@amadersangbad.com" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
+                            </div>
                         </div>
                     </details>
 
-                    <!-- Direct Action Button -->
                     <div class="flex gap-4">
                         <button type="submit" class="w-full bg-black hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-base">
                             🖨️ সরাসরি প্রিন্ট করুন (100% Black, 14pt, Top Margin: 3in)
@@ -253,7 +246,6 @@
                 </form>
             </div>
 
-            <!-- Live Summary Panel (5 Cols) -->
             <div class="lg:col-span-5 flex flex-col gap-6">
                 <div class="bg-black text-white p-6 sm:p-8 rounded-2xl shadow-md border border-slate-800 flex flex-col justify-between h-full">
                     <div>
@@ -316,50 +308,48 @@
         </div>
     </main>
 
-    <!-- Footer -->
     <footer class="bg-black border-t border-slate-800 text-slate-400 text-xs py-4 text-center no-print-element">
-        <p>© ২০২৬ দৈনিক আমাদের সংবাদ | বিজ্ঞাপন বিলিং সফটওয়্যার | ১০০% ব্ল্যাক বাংলা প্রিন্ট (14pt, Top 3in)</p>
+        <p>© ২০২৬ দৈনিক আমাদের সংবাদ | বিজ্ঞাপন বিলিং সফটওয়্যার | www.amadersangbad.com</p>
     </footer>
 
-
-    <!-- DIRECT PRINTABLE LETTERHEAD INVOICE PAD (TOP MARGIN 3 INCH, 100% BLACK #000000, 14PT BANGLA FONT) -->
     <div id="printableInvoice" class="bg-white text-black w-[210mm] min-h-[297mm] shadow-none border-none relative flex flex-col justify-between print-white-paper-mode">
         
         <div>
-            <!-- Header Container (Visible on White Paper, Hidden for Pre-printed Pads) -->
-            <div id="padHeaderBlock" class="border-b-2 border-black pb-3 mb-6">
-                <div class="flex justify-between items-center w-full mb-3 pb-2 border-b-2 border-black">
+            <div id="padHeaderBlock" class="border-b-2 border-black pb-4 mb-6">
+                <div class="flex justify-between items-center w-full mb-4 pb-3 border-b-2 border-black">
                     <div>
                         <h1 id="padCompanyName" class="print-text-head font-black tracking-tight text-black uppercase">দৈনিক আমাদের সংবাদ</h1>
-                        <p id="padCompanyTagline" class="print-text-subhead font-bold text-black mt-0.5">বিজ্ঞাপন বিভাগ ও কমার্শিয়াল সেল</p>
+                        <p id="padCompanyTagline" class="print-text-subhead font-bold text-black mt-1">বিজ্ঞাপন বিভাগ ও কমার্শিয়াল সেল</p>
                     </div>
                     <div class="text-right flex-shrink-0">
-                        <span class="inline-block px-3 py-1 bg-white text-black print-text-14pt font-black border-2 border-black rounded uppercase tracking-wider">বিজ্ঞাপন বিল</span>
+                        <span class="inline-block px-4 py-1.5 bg-white text-black print-text-14pt font-black border-2 border-black rounded uppercase tracking-wider">বিজ্ঞাপন বিল</span>
                     </div>
                 </div>
 
-                <!-- Structured Professional Newspaper Address Header Block -->
-                <div id="padCompanyContact" class="w-full text-black print-text-14pt leading-snug">
-                    <div class="flex flex-wrap justify-between items-start gap-2">
-                        <div class="flex-1 min-w-[300px]">
+                <div id="padCompanyContact" class="w-full text-black print-text-14pt address-line-height space-y-3">
+                    <div class="flex flex-wrap justify-between items-start gap-4">
+                        <div class="flex-1 min-w-[340px]">
                             <strong class="font-extrabold text-black">সম্পাদকীয় কার্যালয়:</strong> 
                             <span id="padHeadOffice" class="font-medium">আজিজ ম্যানশন (১০ম তলা), ৯৩, মতিঝিল (বাণিজ্যিক এলাকা), ঢাকা-১০০০</span>
                         </div>
-                        <div class="text-right flex-shrink-0">
-                            <strong class="font-extrabold text-black">মোবা:</strong> 
-                            <span id="padMobile" class="font-bold">০১৯১৫০৯১৫২৯</span>
+                        <div class="text-right flex-shrink-0 space-y-1">
+                            <div><strong class="font-extrabold text-black">মোবা:</strong> <span id="padMobile" class="font-bold">০১৯১৫০৯১৫২৯</span></div>
+                            <div><strong class="font-extrabold text-black">ওয়েব:</strong> <span id="padWebsite" class="font-bold">www.amadersangbad.com</span></div>
                         </div>
                     </div>
-                    <div class="mt-1 pt-1 border-t border-dashed border-black flex justify-between items-center">
+                    <div class="pt-2 border-t border-dashed border-black flex justify-between items-center flex-wrap gap-3">
                         <div>
                             <strong class="font-extrabold text-black">জেলা কার্যালয়:</strong> 
                             <span id="padBranchOffice" class="font-medium">সরকারি কলেজ রোড, চুয়াডাঙ্গা</span>
+                        </div>
+                        <div class="text-right">
+                            <strong class="font-extrabold text-black">ইমেইল:</strong> 
+                            <span id="padEmail" class="font-medium">info@amadersangbad.com</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Client & Invoice Info Grid -->
             <div class="grid grid-cols-2 gap-4 mb-6 print-text-14pt border-2 border-black rounded-lg p-4 bg-white">
                 <div>
                     <p class="mb-2"><strong class="text-black font-extrabold">প্রাপক / প্রতিষ্ঠান:</strong> <span id="pClientName" class="font-bold text-black"></span></p>
@@ -372,7 +362,6 @@
                 </div>
             </div>
 
-            <!-- Calculation Table -->
             <table class="w-full text-left border-collapse border-2 border-black print-text-14pt mb-6">
                 <thead>
                     <tr class="bg-slate-100 text-black font-black border-b-2 border-black">
@@ -406,13 +395,11 @@
                 </tbody>
             </table>
 
-            <!-- Amount in Words -->
             <div class="p-4 border-2 border-black rounded print-text-14pt mb-12 leading-relaxed bg-white">
                 <strong class="font-extrabold text-black">কথায় (In Words):</strong> <span id="pInWords" class="font-extrabold text-black"></span> টাকা মাত্র।
             </div>
         </div>
 
-        <!-- Signature Block -->
         <div class="mt-16 pt-8 flex justify-between items-end print-text-14pt text-black font-black">
             <div class="text-center w-52 border-t-2 border-black pt-2">
                 গ্রাহকের স্বাক্ষর
@@ -424,13 +411,9 @@
 
     </div>
 
-
-    <!-- JavaScript Section -->
     <script>
-        // Set default publication date to today
         document.getElementById('publishDate').valueAsDate = new Date();
 
-        // Strict Date Formatting to DD-MM-YYYY
         function formatDateToDDMMYYYY(dateInput) {
             if (!dateInput) return '---';
             let d;
@@ -450,7 +433,6 @@
             return `${dd}-${mm}-${yyyy}`;
         }
 
-        // Convert Numbers into Bengali Words Algorithm
         function numberToBengaliWords(num) {
             if (isNaN(num) || num === null || num === undefined) return "শূন্য";
             let n = parseFloat(num);
@@ -566,10 +548,8 @@
             const vatAmount = (subtotal * vatPercent) / 100;
             const grandTotal = (subtotal + vatAmount) - discount;
 
-            // Update Input
             document.getElementById('grandTotalDisplay').value = grandTotal.toFixed(2) + ' ৳';
 
-            // Update Summary Card
             document.getElementById('cardClient').innerText = clientName;
             document.getElementById('cardTitle').innerText = adTitle;
             document.getElementById('cardSize').innerText = sizeText;
@@ -603,6 +583,8 @@
             document.getElementById('padHeadOffice').innerText = document.getElementById('companyHeadOfficeInput').value;
             document.getElementById('padBranchOffice').innerText = document.getElementById('companyBranchOfficeInput').value;
             document.getElementById('padMobile').innerText = document.getElementById('companyMobileInput').value;
+            document.getElementById('padWebsite').innerText = document.getElementById('companyWebsiteInput').value;
+            document.getElementById('padEmail').innerText = document.getElementById('companyEmailInput').value;
         }
 
         function printDirectly() {
@@ -617,11 +599,9 @@
             const data = calculateBill();
             const todayFormatted = formatDateToDDMMYYYY(new Date());
 
-            // Update Header Visibility & Text Details
             toggleHeaderVisibility();
             updateHeaderDetails();
 
-            // Update Letterhead Paper Elements
             document.getElementById('pClientName').innerText = data.clientName;
             document.getElementById('pAdTitle').innerText = data.adTitle;
             document.getElementById('pBillNo').innerText = document.getElementById('billNo').value;
@@ -637,7 +617,6 @@
             document.getElementById('pGrandTotal').innerText = data.grandTotal.toFixed(2) + ' ৳';
             document.getElementById('pInWords').innerText = data.wordsText;
 
-            // Trigger Direct Native Browser Print Window
             window.print();
         }
 
@@ -647,10 +626,11 @@
             document.getElementById('toggleHeaderCheckbox').checked = true;
             toggleHeaderVisibility();
             calculateBill();
+            updateHeaderDetails();
         }
 
-        // Initialize Calculation on Load
         calculateBill();
+        updateHeaderDetails();
     </script>
 </body>
 </html>
