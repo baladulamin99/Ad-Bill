@@ -1,636 +1,233 @@
-<!-- Chosen Palette: Monochrome High-Contrast Print (Pure Black #000000 & Crisp White with Slate Accents) -->
-<!-- Application Structure Plan: A dynamic, single-page Bengali Advertisement Billing Application designed for newspaper ad generation. It features an enhanced fully dynamic address block customizer with increased line height and spacing for better print readability, inch x column / fixed calculation modes, Bengali number-to-words conversion, strict DD-MM-YYYY dates, 100% black font styling, 3-inch top margin pad spacing toggle for pre-printed pads vs plain paper, and responsive Tailwind UI. -->
-<!-- Visualization & Content Choices: Dynamic UI calculation via Vanilla JS, responsive grid layout, media print optimization for A4 (Top: 3in/0.6in, Bottom: 1.5in, Left/Right: 1in), 14pt pure black font size, spacious dynamic address block with generous line spacing, and zero SVG graphics. -->
-<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>বিজ্ঞাপন বিলিং সফটওয়্যার - দৈনিক আমাদের সংবাদ</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * {
-            font-family: 'Hind Siliguri', 'SolaimanLipi', 'Kalpurush', sans-serif !important;
-        }
-
-        body {
-            background-color: #f1f5f9;
-            color: #000000;
-        }
-
-        #printableInvoice {
-            display: none;
-        }
-
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printableInvoice, #printableInvoice * {
-                visibility: visible;
-                color: #000000 !important;
-                border-color: #000000 !important;
-            }
-            #printableInvoice {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                margin: 0;
-                padding-bottom: 1.5in !important;
-                padding-left: 1in !important;
-                padding-right: 1in !important;
-                background: #ffffff !important;
-                box-shadow: none !important;
-                font-size: 14pt !important;
-                line-height: 1.5;
-            }
-
-            .print-pad-mode {
-                padding-top: 3in !important;
-            }
-            .print-white-paper-mode {
-                padding-top: 0.6in !important;
-            }
-
-            #printableInvoice p, 
-            #printableInvoice span, 
-            #printableInvoice td, 
-            #printableInvoice th,
-            #printableInvoice div {
-                color: #000000 !important;
-            }
-            .no-print-element {
-                display: none !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-        }
-
-        .print-text-14pt {
-            font-size: 14pt !important;
-        }
-        .print-text-head {
-            font-size: 24pt !important;
-            line-height: 1.25;
-        }
-        .print-text-subhead {
-            font-size: 14pt !important;
-        }
-
-        .address-line-height {
-            line-height: 1.75 !important;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>বিজ্ঞাপন বিলিং সফটওয়্যার - দৈনিক আমাদের সংবাদ</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Tiro+Bangla:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#000;--mut:#64748b;--line:#cbd5e1;--bg:#eef1f5;--card:#fff;--acc:#0f766e}
+*{box-sizing:border-box;font-family:'Roboto','Tiro Bangla','Kalpurush','SolaimanLipi',sans-serif}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+/* ---------- Screen UI ---------- */
+.top{background:#000;color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.top h1{font-size:18px;margin:0}.top small{color:#94a3b8}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:600;font-size:14px;cursor:pointer}
+.btn-p{background:var(--acc);color:#fff}.btn-p:hover{background:#115e59}
+.btn-g{background:#1e293b;color:#e2e8f0}.btn-g:hover{background:#334155}
+.app{display:grid;grid-template-columns:minmax(340px,430px) 1fr;gap:20px;padding:20px;max-width:1400px;margin:auto;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px;position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+.panel h2{font-size:14px;margin:16px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.panel h2:first-child{margin-top:0}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.f label{display:block;font-size:12px;font-weight:600;margin-bottom:3px}
+.f input,.f select{width:100%;padding:8px 10px;border:1px solid #94a3b8;border-radius:8px;font-size:14px;background:#fff}
+.f input:focus{outline:2px solid #000;border-color:#000}
+.f input[readonly]{background:#f1f5f9;font-weight:700}
+.seg{display:flex;background:#e2e8f0;border-radius:10px;padding:3px;margin-bottom:10px}
+.seg label{flex:1;text-align:center;font-size:13px;font-weight:600;padding:7px;border-radius:8px;cursor:pointer}
+.seg input{display:none}.seg input:checked+span{background:#000;color:#fff}
+.seg span{display:block;padding:7px;border-radius:8px}.seg label{padding:0}
+.tog{display:flex;gap:10px;align-items:flex-start;background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:10px;font-size:13px;margin-top:10px;cursor:pointer}
+.tog small{display:block;color:var(--mut)}
+details{margin-top:10px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:10px}
+summary{cursor:pointer;font-weight:600;font-size:13px}
+.hide{display:none!important}
+.tot{background:#000;color:#fff;border-radius:12px;padding:12px 14px;margin-top:14px;display:flex;justify-content:space-between;align-items:baseline}
+.tot b{font-size:22px}
+.stage{min-width:0}
+.hint{font-size:12px;color:var(--mut);margin:0 0 8px;text-align:center}
+.wrap{margin:auto;position:relative}
+/* ---------- A4 Sheet ---------- */
+#sheet{width:210mm;height:297mm;background:#fff;color:#000;padding:15mm 25.4mm 38.1mm;display:flex;flex-direction:column;font-size:14pt;line-height:1.5;transform-origin:top left;box-shadow:0 8px 30px rgba(0,0,0,.18);overflow:hidden;position:absolute;left:0;top:0}
+#sheet.pad{padding-top:76.2mm}
+#sheet *{color:#000;max-width:100%;overflow-wrap:anywhere}
+#sheet table{table-layout:fixed}
+.sh{border-bottom:3px double #000;padding-bottom:10px;margin-bottom:14px}
+.brand{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.brand h1{font-size:25pt;line-height:1.2;margin:0;font-weight:700}
+.brand p{margin:0;font-weight:600}
+.tag{border:2px solid #000;border-radius:6px;padding:2px 14px;font-weight:700;letter-spacing:.5px;white-space:nowrap}
+.addr{margin-top:8px;border-top:1px solid #000;padding-top:6px}
+.ln{text-align:center;font-size:14pt;line-height:1.7;margin:0}
+.ln.l2{border-top:1px dashed #000;margin-top:4px;padding-top:4px}
+.sp{font-style:normal;margin:0 .6em}
+.meta{display:grid;grid-template-columns:1.3fr 1fr;gap:10px;border:2px solid #000;border-radius:8px;padding:10px 14px;margin-bottom:14px}
+.meta p{margin:0 0 3px}.meta .rt{text-align:right}
+table{width:100%;border-collapse:collapse;border:2px solid #000;margin-bottom:14px}
+th,td{padding:8px 10px;border:1.5px solid #000;font-size:14pt;overflow-wrap:anywhere}
+th{background:#e5e7eb;font-weight:700}
+.c{text-align:center}.rt{text-align:right}
+.gt td{background:#e5e7eb;font-weight:700}
+.words{border:2px solid #000;border-radius:8px;padding:10px 14px;margin-bottom:10px}
+.sign{margin-top:auto;display:flex;justify-content:space-between;font-weight:600}
+.sign div{width:52mm;text-align:center;border-top:2px solid #000;padding-top:4px}
+@media (max-width:900px){.app{grid-template-columns:1fr}.panel{position:static;max-height:none}}
+/* ---------- Print: always A4 ---------- */
+@page{size:A4 portrait;margin:0}
+@media print{
+ html,body{background:#fff!important;width:210mm;height:297mm}
+ .no-print{display:none!important}
+ .app{display:block;padding:0;margin:0;max-width:none}
+ .stage,.wrap{margin:0!important;width:210mm!important;height:297mm!important;position:static!important}
+ #sheet{transform:none!important;box-shadow:none;position:static;page-break-after:avoid;break-after:avoid}
+}
+</style>
 </head>
+<body>
+<header class="top no-print">
+ <div><h1>🧾 বিজ্ঞাপন বিলিং সফটওয়্যার</h1><small>দৈনিক আমাদের সংবাদ — লাইভ A4 প্রিভিউ, Ctrl+P দিলেও A4-এ প্রিন্ট</small></div>
+ <div style="display:flex;gap:8px"><button class="btn" style="background:#7f1d1d;color:#fff" onclick="resetAll()">↺ রিসেট</button><button class="btn btn-g" onclick="resetForm()">🔄 নতুন বিল</button><button class="btn btn-p" onclick="window.print()">🖨️ প্রিন্ট (A4)</button></div>
+</header>
 
-<body class="text-black antialiased min-h-screen flex flex-col justify-between">
+<div class="app">
+<aside class="panel no-print">
+ <h2>গ্রাহক ও বিজ্ঞাপন</h2>
+ <div class="g2">
+  <div class="f" style="grid-column:1/-1"><label>গ্রাহক / প্রতিষ্ঠান *</label><input id="clientName" placeholder="যেমন: রূপালী ফুডস লিমিটেড"></div>
+  <div class="f" style="grid-column:1/-1"><label>বিজ্ঞাপনের বিষয় *</label><input id="adTitle" placeholder="যেমন: ঈদ স্পেশাল অফার"></div>
+  <div class="f"><label>প্রকাশের তারিখ (DD/MM/YYYY)</label><div style="display:flex;gap:6px;position:relative"><input id="publishDate" placeholder="DD/MM/YYYY" maxlength="10" inputmode="numeric" autocomplete="off"><button type="button" class="btn btn-g" style="padding:6px 10px" onclick="$('pubPicker').showPicker?$('pubPicker').showPicker():$('pubPicker').click()">📅</button><input type="date" id="pubPicker" tabindex="-1" style="position:absolute;right:0;bottom:0;width:1px;height:1px;opacity:0;pointer-events:none"></div></div>
+  <div class="f"><label>বিল নম্বর</label><input id="billNo" value="INV-2026-001"></div>
+ </div>
 
-    <header class="bg-black text-white shadow-md no-print-element">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap justify-between items-center gap-4">
-            <div class="flex items-center space-x-3 space-x-reverse">
-                <div class="w-10 h-10 bg-emerald-600 rounded-lg flex items-center justify-center font-bold text-xl text-white shadow">
-                    বিল
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight text-white">বিজ্ঞাপন বিলিং সফটওয়্যার</h1>
-                    <p class="text-xs text-slate-300">দৈনিক আমাদের সংবাদ - বৃদ্ধিপ্রাপ্ত ঠিকানার লাইন স্পেস ও ডায়নামিক প্যাড</p>
-                </div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="resetForm()" class="px-3.5 py-1.5 text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-md transition flex items-center gap-1.5">
-                    🔄 নতুন বিল
-                </button>
-            </div>
-        </div>
-    </header>
+ <h2>হিসাব</h2>
+ <div class="seg">
+  <label><input type="radio" name="calcType" value="inch" checked><span class="c">ইঞ্চি × কলাম</span></label>
+  <label><input type="radio" name="calcType" value="fixed"><span class="c">ফিক্সড রেট</span></label>
+ </div>
+ <div id="inchBox" class="g3">
+  <div class="f"><label>ইঞ্চি</label><input type="number" id="inchVal" step="0.1" value="5" min="0"></div>
+  <div class="f"><label>কলাম</label><input type="number" id="colVal" step="0.1" value="2" min="0"></div>
+  <div class="f"><label>রেট/ইঞ্চি</label><input type="number" id="rateVal" value="500" min="0"></div>
+ </div>
+ <div id="fixedBox" class="f hide"><label>ফিক্সড রেট (টাকা)</label><input type="number" id="fixedRateVal" value="5000" min="0"></div>
+ <div class="g2" style="margin-top:10px">
+  <div class="f"><label>ভ্যাট / ট্যাক্স (%)</label><input type="number" id="vatVal" value="0" min="0"></div>
+  <div class="f"><label>ডিসকাউন্ট (টাকা)</label><input type="number" id="discountVal" value="0" min="0"></div>
+ </div>
+ <div class="tot"><span>সর্বমোট প্রদেয়</span><b id="grandLive">0.00</b></div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow no-print-element">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            
-            <div class="lg:col-span-7 bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-300">
-                <h2 class="text-lg font-bold text-black mb-6 pb-2 border-b border-slate-200 flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 bg-black rounded-full"></span>
-                    বিজ্ঞাপন ও গ্রাহকের তথ্য দিন
-                </h2>
+ <label class="tog"><input type="checkbox" id="showHeader" checked><span><b>সাদা কাগজে হেডার প্রিন্ট করুন</b><small>ছাপানো প্যাডে প্রিন্ট করতে বন্ধ রাখুন (উপরে ৩ ইঞ্চি ফাঁকা থাকবে)</small></span></label>
 
-                <form id="billingForm" onsubmit="event.preventDefault(); printDirectly();">
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">গ্রাহক / প্রতিষ্ঠানের নাম <span class="text-rose-600">*</span></label>
-                            <input type="text" id="clientName" required placeholder="যেমন: রূপালী ফুডস লিমিটেড" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">বিজ্ঞাপনের বিষয় / শিরোনাম <span class="text-rose-600">*</span></label>
-                            <input type="text" id="adTitle" required placeholder="যেমন: ঈদ স্পেশাল অফার" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">প্রকাশের তারিখ <span class="text-rose-600">*</span></label>
-                            <input type="date" id="publishDate" required onchange="calculateBill()" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">বিল নম্বর</label>
-                            <input type="text" id="billNo" value="INV-2026-001" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none transition">
-                        </div>
-                    </div>
+ <details>
+  <summary>⚙️ প্যাডের ঠিকানা ও হেডার কাস্টমাইজ</summary>
+  <div class="g2" style="margin-top:10px">
+   <div class="f"><label>প্রতিষ্ঠানের নাম</label><input id="coName" value="দৈনিক আমাদের সংবাদ"></div>
+   <div class="f"><label>উপশিরোনাম</label><input id="coTag" value="বিজ্ঞাপন বিভাগ ও কমার্শিয়াল সেল"></div>
+   <div class="f" style="grid-column:1/-1"><label>সম্পাদকীয় কার্যালয়</label><input id="coHead" value="আজিজ ম্যানশন (১০ম তলা), ৯৩, মতিঝিল (বাণিজ্যিক এলাকা), ঢাকা-১০০০"></div>
+   <div class="f"><label>জেলা কার্যালয়</label><input id="coBranch" value="শহীদ আবুল কাশেম সড়ক, বড় বাজার, চুয়াডাঙ্গা"></div>
+   <div class="f"><label>মোবাইল</label><input id="coMobile" value="০১৯১৫০৯১৫২৯"></div>
+   <div class="f"><label>ওয়েবসাইট</label><input id="coWeb" value="www.amadersangbad.com"></div>
+   <div class="f"><label>ইমেইল</label><input id="coMail" value="dailyamadersangbad@gmail.com"></div>
+  </div>
+ </details>
+</aside>
 
-                    <div class="bg-slate-100 p-5 rounded-xl border border-slate-300 mb-6">
-                        <label class="block text-xs font-bold text-black mb-3">বিজ্ঞাপন হিসাবের ধরন নির্বাচন করুন:</label>
-                        <div class="flex items-center gap-6 mb-4">
-                            <label class="flex items-center gap-2 cursor-pointer font-bold text-sm text-black">
-                                <input type="radio" name="calcType" value="inch" checked onclick="toggleCalculationType()" class="w-4 h-4 text-black focus:ring-black">
-                                ইঞ্চি × কলাম হিসাব
-                            </label>
-                            <label class="flex items-center gap-2 cursor-pointer font-bold text-sm text-black">
-                                <input type="radio" name="calcType" value="fixed" onclick="toggleCalculationType()" class="w-4 h-4 text-black focus:ring-black">
-                                ফিক্সড (স্থির) রেট
-                            </label>
-                        </div>
+<section class="stage">
+ <p class="hint no-print">লাইভ A4 প্রিভিউ — যা দেখছেন হুবহু তাই প্রিন্ট হবে</p>
+ <div class="wrap" id="wrap">
+ <div id="sheet">
+  <div id="sh" class="sh">
+   <div class="brand">
+    <div><h1 id="pCo"></h1><p id="pTag"></p></div>
+    <span class="tag">বিজ্ঞাপন বিল</span>
+   </div>
+   <div class="addr">
+    <div class="ln"><b>সম্পাদকীয় কার্যালয়:</b> <span id="pHead"></span><i class="sp">|</i><b>জেলা কার্যালয়:</b> <span id="pBranch"></span></div>
+    <div class="ln l2"><b>মোবা:</b> <span id="pMob"></span><i class="sp">|</i><b>ইমেইল:</b> <span id="pMail"></span><i class="sp">|</i><b>ওয়েব:</b> <span id="pWeb"></span></div>
+   </div>
+  </div>
 
-                        <div id="inchSection" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            <div>
-                                <label class="block text-xs font-bold text-black mb-1">ইঞ্চি (Height)</label>
-                                <input type="number" id="inchVal" step="0.1" value="5" oninput="calculateBill()" class="w-full px-3 py-2 text-sm border border-slate-400 rounded-md focus:ring-2 focus:ring-black outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-black mb-1">কলাম (Width)</label>
-                                <input type="number" id="colVal" step="0.1" value="2" oninput="calculateBill()" class="w-full px-3 py-2 text-sm border border-slate-400 rounded-md focus:ring-2 focus:ring-black outline-none">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-black mb-1">রেট (টাকা/ইঞ্চি)</label>
-                                <input type="number" id="rateVal" value="500" oninput="calculateBill()" class="w-full px-3 py-2 text-sm border border-slate-400 rounded-md focus:ring-2 focus:ring-black outline-none">
-                            </div>
-                        </div>
+  <div class="meta">
+   <div><p><b>প্রাপক:</b> <span id="pClient"></span></p><p><b>বিষয়:</b> <span id="pAd"></span></p></div>
+   <div class="rt"><p><b>বিল নং:</b> <span id="pNo"></span></p><p><b>বিল তারিখ:</b> <span id="pToday"></span></p><p><b>প্রকাশ:</b> <span id="pPub"></span></p></div>
+  </div>
 
-                        <div id="fixedSection" class="hidden">
-                            <div>
-                                <label class="block text-xs font-bold text-black mb-1">সর্বমোট ফিক্সড রেট (টাকা)</label>
-                                <input type="number" id="fixedRateVal" value="5000" oninput="calculateBill()" class="w-full px-3 py-2 text-sm border border-slate-400 rounded-md focus:ring-2 focus:ring-black outline-none">
-                            </div>
-                        </div>
-                    </div>
+  <table>
+   <thead><tr><th style="width:34%">বিবরণ</th><th class="c" style="width:26%">সাইজ / পরিমাপ</th><th class="c" style="width:16%">একক রেট</th><th class="rt" style="width:24%">মোট টাকা</th></tr></thead>
+   <tbody>
+    <tr><td><b>সংবাদপত্রে বিজ্ঞাপন প্রকাশনা</b></td><td class="c" id="pSize"></td><td class="c" id="pRate"></td><td class="rt" id="pSub"></td></tr>
+    <tr><td colspan="3" class="rt">ভ্যাট / ট্যাক্স (<span id="pVatP"></span>%):</td><td class="rt" id="pVat"></td></tr>
+    <tr><td colspan="3" class="rt">ডিসকাউন্ট:</td><td class="rt" id="pDisc"></td></tr>
+    <tr class="gt"><td colspan="3" class="rt">সর্বমোট প্রদেয় বিল:</td><td class="rt" id="pGrand"></td></tr>
+   </tbody>
+  </table>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">ভ্যাট / ট্যাক্স (%)</label>
-                            <input type="number" id="vatVal" value="0" oninput="calculateBill()" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">ডিসকাউন্ট (টাকা)</label>
-                            <input type="number" id="discountVal" value="0" oninput="calculateBill()" class="w-full px-3.5 py-2.5 text-sm border border-slate-400 rounded-lg focus:ring-2 focus:ring-black outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-black mb-1">সর্বমোট দেয় বিল (টাকা)</label>
-                            <input type="text" id="grandTotalDisplay" readonly class="w-full px-3.5 py-2.5 text-sm font-extrabold bg-slate-100 text-black border border-black rounded-lg outline-none">
-                        </div>
-                    </div>
+  <div class="words"><b>কথায়:</b> <span id="pWords"></span></div>
 
-                    <div class="bg-amber-50 border border-amber-300 rounded-xl p-4 mb-6">
-                        <label class="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" id="toggleHeaderCheckbox" checked onchange="toggleHeaderVisibility()" class="w-5 h-5 text-black rounded focus:ring-black">
-                            <div>
-                                <span class="text-sm font-bold text-black block">সাদা কাগজে প্রতিষ্ঠানের হেডার প্রিন্ট করুন</span>
-                                <span class="text-xs text-slate-600 block">ছাপানো প্যাডে প্রিন্ট করতে চাইলে এই চেকমার্কটি বন্ধ রাখুন (উপরে ৩ ইঞ্চি ফাঁকা থাকবে)</span>
-                            </div>
-                        </label>
-                    </div>
+  <div class="sign"><div>গ্রাহকের স্বাক্ষর</div><div>বিজ্ঞাপন ব্যবস্থাপক</div></div>
+ </div>
+ </div>
+</section>
+</div>
 
-                    <details open class="mb-6 bg-slate-50 border border-slate-300 rounded-xl p-4">
-                        <summary class="cursor-pointer text-xs font-bold text-black hover:underline transition">
-                            ⚙️ প্যাডের ডায়নামিক ঠিকানা, ওয়েবসাইট ও হেডার কাস্টমাইজ করুন
-                        </summary>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-300">
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">প্রতিষ্ঠানের নাম</label>
-                                <input type="text" id="companyNameInput" value="দৈনিক আমাদের সংবাদ" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">উপশিরোনাম / বিভাগ</label>
-                                <input type="text" id="companyTaglineInput" value="বিজ্ঞাপন বিভাগ ও কমার্শিয়াল সেল" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[11px] font-bold text-black">সম্পাদকীয় কার্যালয়</label>
-                                <input type="text" id="companyHeadOfficeInput" value="আজিজ ম্যানশন (১০ম তলা), ৯৩, মতিঝিল (বাণিজ্যিক এলাকা), ঢাকা-১০০০" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">জেলা কার্যালয়</label>
-                                <input type="text" id="companyBranchOfficeInput" value="সরকারি কলেজ রোড, চুয়াডাঙ্গা" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">মোবাইল নম্বর</label>
-                                <input type="text" id="companyMobileInput" value="০১৯১৫০৯১৫২৯" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">ওয়েবসাইট ইউআরএল</label>
-                                <input type="text" id="companyWebsiteInput" value="www.amadersangbad.com" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                            <div>
-                                <label class="block text-[11px] font-bold text-black">ইমেইল ঠিকানা</label>
-                                <input type="text" id="companyEmailInput" value="dailyamadersangbad@gmail.com" oninput="updateHeaderDetails()" class="w-full px-2.5 py-1.5 text-xs border rounded border-slate-400">
-                            </div>
-                        </div>
-                    </details>
+<script>
+const $=id=>document.getElementById(id);
+const U="০,এক,দুই,তিন,চার,পাঁচ,ছয়,সাত,আট,নয়,দশ,এগারো,বারো,তেরো,চৌদ্দ,পনেরো,ষোলো,সতেরো,আঠারো,উনিশ,বিশ,একুশ,বাইশ,তেইশ,চব্বিশ,পঁচিশ,ছাব্বিশ,সাতাশ,আটাশ,ঊনত্রিশ,ত্রিশ,একত্রিশ,বত্রিশ,তেত্রিশ,চৌত্রিশ,পঁয়ত্রিশ,ছত্রিশ,সাঁইত্রিশ,আটত্রিশ,ঊনচল্লিশ,চল্লিশ,একচল্লিশ,বিয়াল্লিশ,তেতাল্লিশ,চুয়াল্লিশ,পঁয়তাল্লিশ,ছেচল্লিশ,সাতচল্লিশ,আটচল্লিশ,ঊনপঞ্চাশ,পঞ্চাশ,একান্ন,বাহান্ন,তিপ্পান্ন,চুয়ান্ন,পঞ্চান্ন,ছাপ্পান্ন,সাতান্ন,আটান্ন,ঊনষাট,ষাট,একষট্টি,বাষট্টি,তেষট্টি,চৌষট্টি,পঁয়ষট্টি,ছেষট্টি,সাতষট্টি,আটষট্টি,ঊনসত্তর,সত্তর,একাত্তর,বাহাত্তর,তিয়াত্তর,চুয়াত্তর,পঁচাত্তর,ছিয়াত্তর,সাতাত্তর,আটাত্তর,ঊনআশি,আশি,একাশি,বিরাশি,তিরাশি,চুরাশি,পঁচাশি,ছিয়াশি,সাতাশি,আটাশি,ঊননব্বই,নব্বই,একানব্বই,বিরানব্বই,তিরানব্বই,চুরানব্বই,পঁচানব্বই,ছিয়ানব্বই,সাতানব্বই,আটানব্বই,নিরানব্বই".split(",");
+function grp(v){let r=[];
+ [[1e7,"কোটি"],[1e5,"লক্ষ"],[1e3,"হাজার"],[100,"শত"]].forEach(([d,n])=>{if(v>=d){r.push(grp(Math.floor(v/d)),n);v%=d}});
+ if(v>0)r.push(U[v]);return r.join(" ")}
+function words(n){const [t,p]=n.toFixed(2).split(".").map(Number);
+ let s=(t>0?grp(t):"শূন্য")+" টাকা";if(p>0)s+=" "+grp(p)+" পয়সা";return s+" মাত্র।"}
+const money=n=>n.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const bn=n=>n.toLocaleString("bn-BD");
+function dmy(d){if(!d)return"---";if(typeof d==="string"){if(d.includes("/"))return d;const p=d.split("-");return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:d}
+ return [String(d.getDate()).padStart(2,"0"),String(d.getMonth()+1).padStart(2,"0"),d.getFullYear()].join("/")}
+const val=id=>parseFloat($(id).value)||0, txt=id=>$(id).value.trim();
+const CO={coName:"pCo",coTag:"pTag",coHead:"pHead",coBranch:"pBranch",coMobile:"pMob",coWeb:"pWeb",coMail:"pMail"};
 
-                    <div class="flex gap-4">
-                        <button type="submit" class="w-full bg-black hover:bg-slate-800 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition flex items-center justify-center gap-2 text-base">
-                            🖨️ সরাসরি প্রিন্ট করুন (100% Black, 14pt, Top Margin: 3in)
-                        </button>
-                    </div>
+function render(){
+ const inch=document.querySelector('[name=calcType]:checked').value==="inch";
+ $("inchBox").classList.toggle("hide",!inch);$("fixedBox").classList.toggle("hide",inch);
+ let sub,size,rate;
+ if(inch){const h=val("inchVal"),c=val("colVal"),r=val("rateVal");sub=h*c*r;
+  size=`${bn(h)}″ × ${bn(c)} কলাম`;rate=`${bn(r)}`}
+ else{sub=val("fixedRateVal");size="ফিক্সড প্যাকেজ";rate="এককালীন চুক্তি"}
+ const vp=val("vatVal"),vat=sub*vp/100,disc=val("discountVal"),grand=Math.max(0,sub+vat-disc);
 
-                </form>
-            </div>
+ $("grandLive").textContent=money(grand);
+ $("pClient").textContent=txt("clientName")||"---";$("pAd").textContent=txt("adTitle")||"---";
+ $("pNo").textContent=txt("billNo")||"---";$("pToday").textContent=dmy(new Date());$("pPub").textContent=dmy($("publishDate").value);
+ $("pSize").textContent=size;$("pRate").textContent=rate;$("pSub").textContent=money(sub);
+ $("pVatP").textContent=vp;$("pVat").textContent=money(vat);$("pDisc").textContent=money(disc);
+ $("pGrand").textContent=money(grand);$("pWords").textContent=words(grand);
+ for(const k in CO)$(CO[k]).textContent=txt(k);
+ const hdr=$("showHeader").checked;
+ $("sh").classList.toggle("hide",!hdr);$("sheet").classList.toggle("pad",!hdr);
+ try{localStorage.setItem("adbill_co2",JSON.stringify(Object.keys(CO).reduce((o,k)=>(o[k]=$(k).value,o),{})))}catch(e){}
+}
+function fit(){ // scale the A4 preview to the available width (screen only)
+ const w=$("wrap"),sh=$("sheet"),avail=w.parentElement.clientWidth,full=sh.offsetWidth;
+ const s=Math.min(1,avail/full);sh.style.transform=`scale(${s})`;
+ w.style.width=full*s+"px";w.style.height=sh.offsetHeight*s+"px";
+}
+function resetForm(){
+ ["clientName","adTitle"].forEach(i=>$(i).value="");$("publishDate").value=dmy(new Date());
+ $("discountVal").value=0;render();
+}
+function resetAll(){
+ if(!confirm("ফর্মের সব তথ্য মুছে ডিফল্টে ফিরিয়ে নেওয়া হবে। নিশ্চিত?"))return;
+ const D={clientName:"",adTitle:"",inchVal:5,colVal:2,rateVal:500,fixedRateVal:5000,vatVal:0,discountVal:0};
+ for(const k in D)$(k).value=D[k];
+ document.querySelector('[name=calcType][value=inch]').checked=true;
+ $("showHeader").checked=true;$("publishDate").value=dmy(new Date());
+ render();$("clientName").focus();
+}
+function nextBillNo(){const m=$("billNo").value.match(/^(.*?)(\d+)$/);
+ if(m)$("billNo").value=m[1]+String(+m[2]+1).padStart(m[2].length,"0")}
 
-            <div class="lg:col-span-5 flex flex-col gap-6">
-                <div class="bg-black text-white p-6 sm:p-8 rounded-2xl shadow-md border border-slate-800 flex flex-col justify-between h-full">
-                    <div>
-                        <div class="flex justify-between items-center pb-4 border-b border-slate-800 mb-6">
-                            <span class="text-xs uppercase tracking-wider text-slate-300 font-bold">লাইভ হিসাব সারসংক্ষেপ</span>
-                            <span class="px-2.5 py-1 bg-white text-black rounded-full text-xs font-bold">মার্জিন: ৩ ইঞ্চি</span>
-                        </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-xs text-slate-400">গ্রাহকের নাম:</p>
-                                <p class="text-base font-bold text-white" id="cardClient">---</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-400">বিজ্ঞাপনের বিবরণ:</p>
-                                <p class="text-sm font-semibold text-slate-200" id="cardTitle">---</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 pt-2">
-                                <div>
-                                    <p class="text-xs text-slate-400">পরিমাপ / সাইজ:</p>
-                                    <p class="text-sm font-bold text-white" id="cardSize">১০ ইঞ্চি/কলাম</p>
-                                </div>
-                                <div>
-                                    <p class="text-xs text-slate-400">মূল্য রেট:</p>
-                                    <p class="text-sm font-bold text-white" id="cardRate">৫০০ ৳/ইঞ্চি</p>
-                                </div>
-                            </div>
-                            <div class="pt-2 border-t border-slate-800">
-                                <p class="text-xs text-slate-400">প্রকাশের তারিখ (DD-MM-YYYY):</p>
-                                <p class="text-sm font-bold text-white" id="cardPublishDate">---</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-8 pt-6 border-t border-slate-800">
-                        <div class="flex justify-between text-xs text-slate-300 mb-1">
-                            <span>মূল বিজ্ঞাপনী বিল:</span>
-                            <span id="cardSubtotal" class="font-bold">০.০০ ৳</span>
-                        </div>
-                        <div class="flex justify-between text-xs text-slate-300 mb-1">
-                            <span>ভ্যাট:</span>
-                            <span id="cardVat" class="font-bold">০.০০ ৳</span>
-                        </div>
-                        <div class="flex justify-between text-xs text-slate-300 mb-4">
-                            <span>ডিসকাউন্ট:</span>
-                            <span id="cardDiscount" class="font-bold">০.০০ ৳</span>
-                        </div>
-                        <div class="flex justify-between items-baseline pt-3 border-t border-slate-800 text-white">
-                            <span class="text-sm font-bold">সর্বমোট প্রদেয়:</span>
-                            <span class="text-2xl font-black" id="cardGrandTotal">০.০০ ৳</span>
-                        </div>
-                        <div class="mt-4 p-3 bg-slate-900 rounded-lg text-xs text-slate-200 leading-relaxed border border-slate-800">
-                            <span class="font-bold text-slate-400 block mb-0.5">কথায় (In Words):</span>
-                            <span id="cardInWords" class="text-white font-semibold">শূন্য টাকা মাত্র</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <footer class="bg-black border-t border-slate-800 text-slate-400 text-xs py-4 text-center no-print-element">
-        <p>© ২০২৬ দৈনিক আমাদের সংবাদ | বিজ্ঞাপন বিলিং সফটওয়্যার | www.amadersangbad.com</p>
-    </footer>
-
-    <div id="printableInvoice" class="bg-white text-black w-[210mm] min-h-[297mm] shadow-none border-none relative flex flex-col justify-between print-white-paper-mode">
-        
-        <div>
-            <div id="padHeaderBlock" class="border-b-2 border-black pb-4 mb-6">
-                <div class="flex justify-between items-center w-full mb-4 pb-3 border-b-2 border-black">
-                    <div>
-                        <h1 id="padCompanyName" class="print-text-head font-black tracking-tight text-black uppercase">দৈনিক আমাদের সংবাদ</h1>
-                        <p id="padCompanyTagline" class="print-text-subhead font-bold text-black mt-1">বিজ্ঞাপন বিভাগ ও কমার্শিয়াল সেল</p>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <span class="inline-block px-4 py-1.5 bg-white text-black print-text-14pt font-black border-2 border-black rounded uppercase tracking-wider">বিজ্ঞাপন বিল</span>
-                    </div>
-                </div>
-
-                <div id="padCompanyContact" class="w-full text-black print-text-14pt address-line-height space-y-3">
-                    <div class="flex flex-wrap justify-between items-start gap-4">
-                        <div class="flex-1 min-w-[340px]">
-                            <strong class="font-extrabold text-black">সম্পাদকীয় কার্যালয়:</strong> 
-                            <span id="padHeadOffice" class="font-medium">আজিজ ম্যানশন (১০ম তলা), ৯৩, মতিঝিল (বাণিজ্যিক এলাকা), ঢাকা-১০০০</span>
-                        </div>
-                        <div class="text-right flex-shrink-0 space-y-1">
-                            <div><strong class="font-extrabold text-black">মোবা:</strong> <span id="padMobile" class="font-bold">০১৯১৫০৯১৫২৯</span></div>
-                            <div><strong class="font-extrabold text-black">ওয়েব:</strong> <span id="padWebsite" class="font-bold">www.amadersangbad.com</span></div>
-                        </div>
-                    </div>
-                    <div class="pt-2 border-t border-dashed border-black flex justify-between items-center flex-wrap gap-3">
-                        <div>
-                            <strong class="font-extrabold text-black">জেলা কার্যালয়:</strong> 
-                            <span id="padBranchOffice" class="font-medium">সরকারি কলেজ রোড, চুয়াডাঙ্গা</span>
-                        </div>
-                        <div class="text-right">
-                            <strong class="font-extrabold text-black">ইমেইল:</strong> 
-                            <span id="padEmail" class="font-medium">dailyamadersangbad@gmail.com</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4 mb-6 print-text-14pt border-2 border-black rounded-lg p-4 bg-white">
-                <div>
-                    <p class="mb-2"><strong class="text-black font-extrabold">প্রাপক / প্রতিষ্ঠান:</strong> <span id="pClientName" class="font-bold text-black"></span></p>
-                    <p><strong class="text-black font-extrabold">বিজ্ঞাপনের বিষয়:</strong> <span id="pAdTitle" class="font-bold text-black"></span></p>
-                </div>
-                <div class="text-right">
-                    <p class="mb-1"><strong class="text-black font-extrabold">বিল নম্বর:</strong> <span id="pBillNo" class="font-bold text-black"></span></p>
-                    <p class="mb-1"><strong class="text-black font-extrabold">বিল তৈরির তারিখ:</strong> <span id="pInvoiceDate" class="font-bold text-black"></span></p>
-                    <p><strong class="text-black font-extrabold">বিজ্ঞাপন প্রকাশের তারিখ:</strong> <span id="pPublishDate" class="font-bold text-black"></span></p>
-                </div>
-            </div>
-
-            <table class="w-full text-left border-collapse border-2 border-black print-text-14pt mb-6">
-                <thead>
-                    <tr class="bg-slate-100 text-black font-black border-b-2 border-black">
-                        <th class="p-3 border-r-2 border-black">বিবরণ</th>
-                        <th class="p-3 border-r-2 border-black text-center">সাইজ / পরিমাপ</th>
-                        <th class="p-3 border-r-2 border-black text-center">একক রেট</th>
-                        <th class="p-3 text-right">মোট টাকা</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="border-b-2 border-black">
-                        <td class="p-3 border-r-2 border-black font-bold text-black">
-                            সংবাদপত্রে বিজ্ঞাপন প্রকাশনা
-                        </td>
-                        <td class="p-3 border-r-2 border-black text-center font-bold text-black" id="pSize"></td>
-                        <td class="p-3 border-r-2 border-black text-center font-bold text-black" id="pRate"></td>
-                        <td class="p-3 text-right font-black text-black" id="pSubTotal"></td>
-                    </tr>
-                    <tr class="border-b-2 border-black">
-                        <td colspan="3" class="p-2.5 text-right border-r-2 border-black font-bold text-black">ভ্যাট / ট্যাক্স:</td>
-                        <td class="p-2.5 text-right font-bold text-black" id="pVat"></td>
-                    </tr>
-                    <tr class="border-b-2 border-black">
-                        <td colspan="3" class="p-2.5 text-right border-r-2 border-black font-bold text-black">ডিসকাউন্ট:</td>
-                        <td class="p-2.5 text-right font-bold text-black" id="pDiscount"></td>
-                    </tr>
-                    <tr class="bg-slate-100 text-black font-black">
-                        <td colspan="3" class="p-3 text-right border-r-2 border-black">সর্বমোট প্রদেয় বিল:</td>
-                        <td class="p-3 text-right text-black font-black" id="pGrandTotal"></td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="p-4 border-2 border-black rounded print-text-14pt mb-12 leading-relaxed bg-white">
-                <strong class="font-extrabold text-black">কথায় (In Words):</strong> <span id="pInWords" class="font-extrabold text-black"></span> টাকা মাত্র।
-            </div>
-        </div>
-
-        <div class="mt-16 pt-8 flex justify-between items-end print-text-14pt text-black font-black">
-            <div class="text-center w-52 border-t-2 border-black pt-2">
-                গ্রাহকের স্বাক্ষর
-            </div>
-            <div class="text-center w-52 border-t-2 border-black pt-2">
-                বিজ্ঞাপন ব্যবস্থাপক
-            </div>
-        </div>
-
-    </div>
-
-    <script>
-        document.getElementById('publishDate').valueAsDate = new Date();
-
-        function formatDateToDDMMYYYY(dateInput) {
-            if (!dateInput) return '---';
-            let d;
-            if (typeof dateInput === 'string') {
-                const parts = dateInput.split('-');
-                if (parts.length === 3 && parts[0].length === 4) {
-                    return `${parts[2]}-${parts[1]}-${parts[0]}`;
-                }
-                d = new Date(dateInput);
-            } else {
-                d = dateInput;
-            }
-            if (isNaN(d.getTime())) return dateInput;
-            const dd = String(d.getDate()).padStart(2, '0');
-            const mm = String(d.getMonth() + 1).padStart(2, '0');
-            const yyyy = d.getFullYear();
-            return `${dd}-${mm}-${yyyy}`;
-        }
-
-        function numberToBengaliWords(num) {
-            if (isNaN(num) || num === null || num === undefined) return "শূন্য";
-            let n = parseFloat(num);
-            if (n === 0) return "শূন্য";
-
-            const units = [
-                "", "এক", "দুই", "তিন", "চার", "পাঁচ", "ছয়", "সাত", "আট", "নয়", "দশ", 
-                "এগারো", "বারো", "তেরো", "চৌদ্দ", "পনেরো", "ষোলো", "সতেরো", "আঠারো", "উনিশ", "বিশ", 
-                "একুশ", "বাইশ", "তেইশ", "চব্বিশ", "পঁচিশ", "ছাব্বিশ", "সাতাশ", "আঠাশ", "উনত্রিশ", "ত্রিশ", 
-                "একত্রিশ", "বত্রিশ", "তেতাল্লিশ", "চৌত্রিশ", "পঁয়তাল্লিশ", "ছত্রিশ", "সাইত্রিশ", "আটত্রিশ", "উনচল্লিশ", "চল্লিশ", 
-                "একচল্লিশ", "বিয়াল্লিশ", "তেতাল্লিশ", "চৌয়াল্লিশ", "পঁয়তাল্লিশ", "ছেচল্লিশ", "সাতচল্লিশ", "আটচল্লিশ", "উনপঞ্চাশ", "পঞ্চাশ", 
-                "একান্ন", "বায়ান্ন", "তিপ্পান্ন", "চৌয়ান্ন", "পঞ্চান্ন", "ছাপ্পান্ন", "সাতান্ন", "আটান্ন", "উনষাট", "ষাট", 
-                "একষট্টি", "বাষট্টি", "তেষট্টি", "চৌষট্টি", "পঁয়ষট্টি", "ছেষট্টি", "সাতষট্টি", "আটষট্টি", "উনসত্তর", "সত্তর", 
-                "একাত্তর", "বাহাত্তর", "তিয়াত্তর", "চৌহাত্তর", "পঁচাত্তর", "ছিয়াত্তর", "সাতাত্তর", "আটাত্তর", "উনাশি", "আশি", 
-                "একাশি", "বিরাশি", "তিরাশি", "চৌরাশি", "পঁচাশি", "ছিয়াশি", "সাতাশি", "আটাশি", "উনানব্বই", "নব্বই", 
-                "একানব্বই", "বিরানব্বই", "তেরানব্বই", "চৌরানব্বই", "পঁচানব্বই", "ছিয়ানব্বই", "সাতানব্বই", "আটানব্বই", "নিরানব্বই"
-            ];
-
-            function convertGroup(val) {
-                let res = "";
-                if (val >= 10000000) {
-                    res += convertGroup(Math.floor(val / 10000000)) + " কোটি ";
-                    val %= 10000000;
-                }
-                if (val >= 100000) {
-                    res += convertGroup(Math.floor(val / 100000)) + " লক্ষ ";
-                    val %= 100000;
-                }
-                if (val >= 1000) {
-                    res += convertGroup(Math.floor(val / 1000)) + " হাজার ";
-                    val %= 1000;
-                }
-                if (val >= 100) {
-                    res += convertGroup(Math.floor(val / 100)) + " শত ";
-                    val %= 100;
-                }
-                if (val > 0) {
-                    res += units[val] + " ";
-                }
-                return res.trim();
-            }
-
-            let parts = n.toFixed(2).split('.');
-            let taka = parseInt(parts[0], 10);
-            let paisa = parseInt(parts[1], 10);
-
-            let takaText = taka > 0 ? convertGroup(taka) : "শূন্য";
-            let result = takaText;
-
-            if (paisa > 0) {
-                result += " টাকা " + convertGroup(paisa) + " পয়সা";
-            }
-
-            return result.trim();
-        }
-
-        function toggleCalculationType() {
-            const type = document.querySelector('input[name="calcType"]:checked').value;
-            if (type === 'inch') {
-                document.getElementById('inchSection').classList.remove('hidden');
-                document.getElementById('fixedSection').classList.add('hidden');
-            } else {
-                document.getElementById('inchSection').classList.add('hidden');
-                document.getElementById('fixedSection').classList.remove('hidden');
-            }
-            calculateBill();
-        }
-
-        function toggleHeaderVisibility() {
-            const isChecked = document.getElementById('toggleHeaderCheckbox').checked;
-            const padHeaderBlock = document.getElementById('padHeaderBlock');
-            const printableInvoice = document.getElementById('printableInvoice');
-
-            if (isChecked) {
-                padHeaderBlock.style.display = 'block';
-                printableInvoice.classList.remove('print-pad-mode');
-                printableInvoice.classList.add('print-white-paper-mode');
-            } else {
-                padHeaderBlock.style.display = 'none';
-                printableInvoice.classList.remove('print-white-paper-mode');
-                printableInvoice.classList.add('print-pad-mode');
-            }
-        }
-
-        function calculateBill() {
-            const clientName = document.getElementById('clientName').value || '---';
-            const adTitle = document.getElementById('adTitle').value || '---';
-            const rawDate = document.getElementById('publishDate').value;
-            const formattedPublishDate = formatDateToDDMMYYYY(rawDate);
-            const type = document.querySelector('input[name="calcType"]:checked').value;
-
-            let subtotal = 0;
-            let sizeText = '';
-            let rateText = '';
-
-            if (type === 'inch') {
-                const inch = parseFloat(document.getElementById('inchVal').value) || 0;
-                const col = parseFloat(document.getElementById('colVal').value) || 0;
-                const rate = parseFloat(document.getElementById('rateVal').value) || 0;
-                
-                subtotal = inch * col * rate;
-                sizeText = `${inch}″ × ${col} কলাম (${inch * col} ইঞ্চি-কলাম)`;
-                rateText = `${rate.toLocaleString('bn-BD')} ৳ / ইঞ্চি`;
-            } else {
-                subtotal = parseFloat(document.getElementById('fixedRateVal').value) || 0;
-                sizeText = 'ফিক্সড প্যাকেজ';
-                rateText = 'এককালীন চুক্তি';
-            }
-
-            const vatPercent = parseFloat(document.getElementById('vatVal').value) || 0;
-            const discount = parseFloat(document.getElementById('discountVal').value) || 0;
-
-            const vatAmount = (subtotal * vatPercent) / 100;
-            const grandTotal = (subtotal + vatAmount) - discount;
-
-            document.getElementById('grandTotalDisplay').value = grandTotal.toFixed(2) + ' ৳';
-
-            document.getElementById('cardClient').innerText = clientName;
-            document.getElementById('cardTitle').innerText = adTitle;
-            document.getElementById('cardSize').innerText = sizeText;
-            document.getElementById('cardRate').innerText = rateText;
-            document.getElementById('cardPublishDate').innerText = formattedPublishDate;
-            document.getElementById('cardSubtotal').innerText = subtotal.toFixed(2) + ' ৳';
-            document.getElementById('cardVat').innerText = vatAmount.toFixed(2) + ' ৳';
-            document.getElementById('cardDiscount').innerText = discount.toFixed(2) + ' ৳';
-            document.getElementById('cardGrandTotal').innerText = grandTotal.toFixed(2) + ' ৳';
-
-            const wordsText = numberToBengaliWords(grandTotal);
-            document.getElementById('cardInWords').innerText = wordsText + ' টাকা মাত্র';
-
-            return {
-                clientName,
-                adTitle,
-                formattedPublishDate,
-                subtotal,
-                vatAmount,
-                discount,
-                grandTotal,
-                sizeText,
-                rateText,
-                wordsText
-            };
-        }
-
-        function updateHeaderDetails() {
-            document.getElementById('padCompanyName').innerText = document.getElementById('companyNameInput').value;
-            document.getElementById('padCompanyTagline').innerText = document.getElementById('companyTaglineInput').value;
-            document.getElementById('padHeadOffice').innerText = document.getElementById('companyHeadOfficeInput').value;
-            document.getElementById('padBranchOffice').innerText = document.getElementById('companyBranchOfficeInput').value;
-            document.getElementById('padMobile').innerText = document.getElementById('companyMobileInput').value;
-            document.getElementById('padWebsite').innerText = document.getElementById('companyWebsiteInput').value;
-            document.getElementById('padEmail').innerText = document.getElementById('companyEmailInput').value;
-        }
-
-        function printDirectly() {
-            const clientVal = document.getElementById('clientName').value.trim();
-            const adVal = document.getElementById('adTitle').value.trim();
-
-            if(!clientVal || !adVal) {
-                alert("অনুগ্রহ করে গ্রাহকের নাম ও বিজ্ঞাপনের বিবরণ দিন।");
-                return;
-            }
-
-            const data = calculateBill();
-            const todayFormatted = formatDateToDDMMYYYY(new Date());
-
-            toggleHeaderVisibility();
-            updateHeaderDetails();
-
-            document.getElementById('pClientName').innerText = data.clientName;
-            document.getElementById('pAdTitle').innerText = data.adTitle;
-            document.getElementById('pBillNo').innerText = document.getElementById('billNo').value;
-            document.getElementById('pInvoiceDate').innerText = todayFormatted;
-            document.getElementById('pPublishDate').innerText = data.formattedPublishDate;
-            
-            document.getElementById('pSize').innerText = data.sizeText;
-            document.getElementById('pRate').innerText = data.rateText;
-            
-            document.getElementById('pSubTotal').innerText = data.subtotal.toFixed(2) + ' ৳';
-            document.getElementById('pVat').innerText = data.vatAmount.toFixed(2) + ' ৳';
-            document.getElementById('pDiscount').innerText = data.discount.toFixed(2) + ' ৳';
-            document.getElementById('pGrandTotal').innerText = data.grandTotal.toFixed(2) + ' ৳';
-            document.getElementById('pInWords').innerText = data.wordsText;
-
-            window.print();
-        }
-
-        function resetForm() {
-            document.getElementById('billingForm').reset();
-            document.getElementById('publishDate').valueAsDate = new Date();
-            document.getElementById('toggleHeaderCheckbox').checked = true;
-            toggleHeaderVisibility();
-            calculateBill();
-            updateHeaderDetails();
-        }
-
-        calculateBill();
-        updateHeaderDetails();
-    </script>
+try{const s=JSON.parse(localStorage.getItem("adbill_co2")||"{}");for(const k in s)if($(k))$(k).value=s[k]}catch(e){}
+$("publishDate").value=dmy(new Date());
+$("publishDate").addEventListener("input",e=>{const d=e.target.value.replace(/\D/g,"").slice(0,8);
+ e.target.value=d.length>4?`${d.slice(0,2)}/${d.slice(2,4)}/${d.slice(4)}`:d.length>2?`${d.slice(0,2)}/${d.slice(2)}`:d});
+$("pubPicker").addEventListener("change",e=>{$("publishDate").value=dmy(e.target.value);render()});
+document.querySelectorAll("input").forEach(e=>e.addEventListener("input",render));
+$("showHeader").addEventListener("change",render);
+window.addEventListener("beforeprint",render);   // Ctrl+P / browser menu also gets fresh data
+window.addEventListener("afterprint",()=>{nextBillNo();render()});
+window.addEventListener("resize",fit);
+render();fit();if(document.fonts)document.fonts.ready.then(render);
+</script>
 </body>
 </html>
